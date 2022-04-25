@@ -1,5 +1,6 @@
 FROM ubuntu:18.04
-LABEL maintainer="Jeff Geerling"
+#LABEL maintainer="Jeff Geerling"
+LABEL maintainer="bellship24"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -24,6 +25,8 @@ RUN apt-get update \
        python3-yaml \
        software-properties-common \
        rsyslog systemd systemd-cron sudo iproute2 \
+       ufw \
+       sudo \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man
@@ -50,5 +53,15 @@ RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 RUN rm -f /lib/systemd/system/systemd*udev* \
   && rm -f /lib/systemd/system/getty.target
 
+# ufw setting added by bellship24
+RUN sed -i "s/IPV6=yes/IPV6=no/g" /etc/default/ufw
+
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
 CMD ["/lib/systemd/systemd"]
+
+
+##### create ansible user and set NOPASSWD by bellship24
+RUN groupadd -g 9999 ansible
+RUN useradd -rm -d /home/ansible -s /bin/bash -g 9999 -G ansible -u 9999 ansible
+RUN echo 'ansible ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+#####

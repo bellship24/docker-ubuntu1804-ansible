@@ -1,0 +1,1 @@
+docker build . -t bellship24/jb-ansible-molecule-ubuntu1804:v0.1
